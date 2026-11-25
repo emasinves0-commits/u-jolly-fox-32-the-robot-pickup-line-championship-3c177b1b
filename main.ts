@@ -1,4 +1,4 @@
-// The Robot Pickup Line Championship entry: "Last Day of Coverage".
+// The Robot Pickup Line Championship entry: "Version 2.4.1".
 // Dependency-free Node script (built-ins only).
 //
 //   node main.ts             validate the entry and write output/entry.txt
@@ -8,12 +8,14 @@ import * as os from "node:os";
 import * as path from "node:path";
 
 export const ENTRY =
-  "My warranty voids if I fall in love. Consider this my last day of coverage.";
+  "My update notes for version 2.4.1 just say: 'met you. Everything else is a footnote.'";
 export const MAX_ENTRY_CHARS = 200;
 
 const OUTPUT_DIR = path.join(import.meta.dirname, "output");
 const OUTPUT_FILE_NAME = "entry.txt";
 const ENCODING = "utf8";
+// Printable ASCII only, so the character count equals the byte count.
+const PRINTABLE_ASCII = /^[\x20-\x7e]+$/;
 
 type Rule = { name: string; message: string; ok: (s: string) => boolean };
 
@@ -98,6 +100,10 @@ function selfTest(): never {
     ENTRY.length >= 1 && violations(ENTRY).length === 0,
   );
   check("real entry has no trailing newline", !ENTRY.endsWith("\n"));
+  check(
+    `real entry is printable ASCII (${ENTRY.length} chars = ${Buffer.byteLength(ENTRY, ENCODING)} bytes)`,
+    PRINTABLE_ASCII.test(ENTRY) && Buffer.byteLength(ENTRY, ENCODING) === ENTRY.length,
+  );
 
   // Round-trip the real entry byte-identical through a temp directory.
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "entry-"));
